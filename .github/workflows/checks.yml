@@ -1,0 +1,17 @@
+## GitHub Actions CI/CD
+---
+name: Checks  #Workflow name
+
+on: [push] #git push event 활성화 => push 이벤트가 발생할 때마다 workflow가 실행됨
+
+jobs:
+  test-lint:
+    name: Test and Lint
+    runs-on: ubuntu-20.04 #GitHub Actions에서 사용할 OS 환경
+    steps: #workflow의 각 단계 
+      - name: Checkout # git repository를 작업 환경으로 가져오는 단계
+        uses: actions/checkout@v2 
+      - name: Test # 테스트 실행 단계
+        run: docker-compose run --rm app sh -c "python manage.py test"
+      - name: Lint
+        run: docker-compose run --rm app sh -c "flake8"
