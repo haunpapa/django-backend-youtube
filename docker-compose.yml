@@ -1,5 +1,6 @@
 version: "3.11"
 services:
+  # 첫번쨰 컨테이너
   app:
     build:
       context: .
@@ -9,4 +10,27 @@ services:
       - "8000:8000"
     volumes:
       - ./app:/app
-    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment: # 아래의 변수들은 .env 파일에 저장하는 것이 좋음  보안상 commit 하지 않는 것이 좋음
+      - DB_HOST=db
+      - DB_NAME=youtube
+      - DB_USER=haupapa
+      - DB_PASSWORD=password123
+    depends_on: # app 컨테이너가 실행되기 전에 db 컨테이너가 실행되어야 함
+      - db
+
+  # 두번째 컨테이너
+  db:
+    image: postgres:16-alpine
+    # 데이터 저장공간(.data/db) => 마운트 => 컨테이너(/var/lib/postgresql/data)
+    # docker-compose up -d => 컨테이너 생성 => 데이터 저장공간에 데이터가 저장됨
+    # docker-compose down => 컨테이너 삭제 => 데이터 저장공간에 데이터가 저장됨
+    # 아래 설정을 통해 컨테이너를 삭제해도 데이터가 유지됨
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=youtube
+      - POSTGRES_USER=haunpapa
+      - POSTGRES_PASSWORD=password123
