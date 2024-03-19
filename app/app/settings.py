@@ -43,7 +43,8 @@ CUSTOM_APPS = [
     'core',
     'users.apps.UsersConfig',
     'rest_framework',
-    'drf_spectacular'
+    'drf_spectacular',
+    'videos.apps.VideosConfig',
 
 ]
 
