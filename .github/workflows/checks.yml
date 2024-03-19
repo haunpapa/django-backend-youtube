@@ -9,6 +9,13 @@ jobs:
     name: Test and Lint
     runs-on: ubuntu-20.04 #GitHub Actions에서 사용할 OS 환경
     steps: #workflow의 각 단계 
+      # docker connection
+      - name : Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          
       - name: Checkout # git repository를 작업 환경으로 가져오는 단계
         uses: actions/checkout@v2 
       - name: Test # 테스트 실행 단계

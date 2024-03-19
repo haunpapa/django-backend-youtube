@@ -42,6 +42,8 @@ DJANGO_SYSTEM_APPS= [
 CUSTOM_APPS = [
     'core',
     'users.apps.UsersConfig',
+    'rest_framework',
+    'drf_spectacular'
 
 ]
 
@@ -145,3 +147,7 @@ DATABASES = {
 
 # Djago의 Custom User Model을 사용하기 위한 설정
 AUTH_USER_MODEL = 'users.User' #users 폴더의 User 모델을 사용하겠다는 설정
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
