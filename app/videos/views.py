@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import Video
-from .serializers import VideoSerializer
+from .serializers import VideoListSerializer, VideoDetailSerializer
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -15,17 +15,17 @@ from rest_framework import status
 #[DELETE] : X
 
 class VideoList(APIView):
-    def get(self):
+    def get(self, request):
         videos = Video.objects.all()
         # 직렬화 (Object -> JSON) - Serializer
 
-        VideoSerializer(videos, many=True)
+        serializer = VideoListSerializer(videos, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         user_data = request.data # JSON -> Python Object (역직렬화)
-        VideoSerializer(data = user_data)
+        serializer = VideoListSerializer(data = user_data)
 
         if serializer.is_valid():
             serializer.save(user=request.user)
@@ -39,13 +39,32 @@ class VideoList(APIView):
 #[POST] : X
 #[PUT] : 특정 비디오의 정보를 수정하는 API
 #[DELETE] : 특정 비디오를 삭제하는 API
+from rest_framework.exceptions import NotFound
 
-class VideoDetail:
-    def get(self, request, video_id):
-        pass
+class VideoDetail(APIView):
+    def get(self, request, pk):
+        try :
+            video_obj = Video.objects.get(pk=pk)
+        except Video.DoesNotExist:
+            raise NotFound('해당 비디오가 존재하지 않습니다.')
+        
+        serailizer = VideoDetailSerializer(video_obj) # Object -> JSON
 
-    def put(self, request, video_id):
-        pass
+        return Response(serailizer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request, video_id):
-        pass
+
+    def put(self, request, pk):
+        video_obj = Video.objects.get(pk=pk) # db에서 해당 비디오를 가져온다.
+        user_data = request.data # 유저가 보낸 데이터
+
+        serializer = VideoDetailSerializer(video_obj, data=user_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save() # is_valid() -> save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, pk):
+        video_obj = Video.objects.get(pk=pk)
+        video_obj.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -6,5 +6,5 @@ from .views import VideoList, VideoDetail
 
 urlpatterns = [
     path('', VideoList.as_view(), name='video-list'),
-    # path('<int:video_id>/', VideoDetail.as_view(), name='video-detail')
+    path('<int:pk>/', VideoDetail.as_view(), name='video-detail')
 ]
