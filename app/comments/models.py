@@ -18,3 +18,6 @@ class Comment(CommonModel):
     # Comment : Video => N : 1
 
     video = models.ForeignKey(Video, on_delete=models.CASCADE)
+
+    # 대댓글 
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')

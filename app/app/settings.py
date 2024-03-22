@@ -47,6 +47,9 @@ CUSTOM_APPS = [
     'videos.apps.VideosConfig',
     'comments.apps.CommentsConfig',
     'subscriptions.apps.SubscriptionsConfig',
+    'reactions.apps.ReactionsConfig',
+    'chat.apps.ChatConfig',
+    # 'channels',
 
 ]
 
@@ -81,7 +84,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'app.wsgi.application'
+
 
 
 # Database
@@ -153,4 +156,16 @@ AUTH_USER_MODEL = 'users.User' #users 폴더의 User 모델을 사용하겠다�
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# Channels를 사용하기 위한 설정
+ASGI_APPLICATION = 'app.routes.application' # Socket (비동기처리)
+
+WSGI_APPLICATION = 'app.wsgi.application' # HTTP (동기처리) - REST API
+
+# Channels 설정
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    },
 }
