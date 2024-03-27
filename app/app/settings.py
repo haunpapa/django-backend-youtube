@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&2#=66cbthf@)p#nppw6ar%l7@=o@2=o!zs1*0n513s17n$wr8'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'password123')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(int(os.environ.get('DEBUG', 0)))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,6 +41,7 @@ DJANGO_SYSTEM_APPS= [
 ]
 
 CUSTOM_APPS = [
+    'daphne',
     'core',
     'users.apps.UsersConfig',
     'rest_framework',
@@ -49,7 +51,7 @@ CUSTOM_APPS = [
     'subscriptions.apps.SubscriptionsConfig',
     'reactions.apps.ReactionsConfig',
     'chat.apps.ChatConfig',
-    # 'channels',
+    'channels',
 
 ]
 
@@ -139,7 +141,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import os
+
 
 DATABASES = {
     'default': {
@@ -159,7 +161,7 @@ REST_FRAMEWORK = {
 }
 
 # Channels를 사용하기 위한 설정
-ASGI_APPLICATION = 'app.routes.application' # Socket (비동기처리)
+ASGI_APPLICATION = 'app.route.application' # Socket (비동기처리)
 
 WSGI_APPLICATION = 'app.wsgi.application' # HTTP (동기처리) - REST API
 
@@ -169,3 +171,9 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     },
 }
+
+STATIC_URL = '/static/static/'
+MEDIA_URL = '/static/media/'
+
+MEDIA_ROOT = '/vol/web/media'
+STATIC_ROOT = '/vol/web/static'

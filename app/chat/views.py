@@ -41,28 +41,29 @@ class ChatRoomList(APIView):
 ### [Get] : 전체 메세지 조회
 ### [Post] : 메세지 생성
     
+from .models import ChatMessage
 from django.shortcuts import get_object_or_404
 from .serializers import ChatMessageSerializer
 from django.shortcuts import render
-
 def chat_html(request):
-    return render(request, 'index.html') # html 파일을 렌더링
-    
-class ChatMessageList(APIView):
-    def get(self,request, room_id):
-        chatroom = get_object_or_404(ChatRoom, id=room_id)
-        messages = ChatMessage.objects.filter(room=chatroom)
+    return render(request, 'index.html') # html 뿌려주는 역활
 
+class ChatMessageList(APIView):
+    def get(self, request, room_id):
+        chatroom = get_object_or_404(ChatRoom, id=room_id)
+        messages = ChatMessage.objects.filter(room=chatroom) # room 객체
+        
+        # 직렬화
         serializer = ChatMessageSerializer(messages, many=True)
         return Response(serializer.data)
 
     def post(self, request, room_id):
-        chatroom = get_object_or_404(ChatRoom, id=room_id)
         user_data = request.data
+        chatroom = get_object_or_404(ChatRoom, id=room_id)
+
         serializer = ChatMessageSerializer(data=user_data)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(room=chatroom, sender=request.user)
+
+        return Response(serializer.data, 201)
